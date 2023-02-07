@@ -1,5 +1,6 @@
 # [HDF5](https://wikidocs.net/24030)
-![HDF5.png](./assets\HDF5.png)- **hdf5**(Hierarchical Data Format version 5)는 대용량 데이터를 저장하기 위한 파일 포맷
+![Alt text](assets/HDF5.png)
+- **hdf5**(Hierarchical Data Format version 5)는 대용량 데이터를 저장하기 위한 파일 포맷
 - 일종의 고성능 DB라고 이해
 - BSD 스타일의 라이선스를 채택하기때문에 수정, 배포, 상용 프로그램 사용 등에 자유로움
 - 특징 요약
