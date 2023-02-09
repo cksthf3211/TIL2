@@ -187,6 +187,103 @@ values()
 /4
 ```
 
+## 데이터셋(1)
+### 기본 사항
+- 데이터셋은 동일한 데이터타입을 갖는 수치로 이루어진 배열(1차던, 2차던, 고차던)을 저장
+- numpy의 ndarray에 이름을 붙여 저장한다고 생각할 수 있다.
 
+- 생성은 그룹의 멤버함수인 `create_dataset(...)` 로 생성
+```bash
+dataset = group.create_dataset(name,shape=None,dtype=None,data=None,...)
+```
+
+- 이미 만들어진 데이터셋의 중요 속성은 `name`, `shape`, `dtype` 이다. `ndarray`로 데이터를 지정할 때는 shape과 dtype을 지정할 필요없다.
+```bash
+import numpy as np
+import h5py
+
+fdata = np.arange(5.)
+
+f = h5py.File('dataset.h5','w')
+
+data1 = f.create_dataset('data1',data=fdata)   # same to f['data'] = fdata
+
+print(data1.name)  # /data1
+print(data1.shape)  # (5,)
+print(data1.dtype)  #[  0. 500.   2.   3.   4.]
+...
+```
+
+- 데이터셋을 억세스하는 것은 `ndarray`와 동일하게 `[]`를 이용한다(예전에서는 `dataset.value`로 직접 내부의 ndarray를 접근하였으나 depreciated 됨)로 가능하다. 아래와 같이 변경하면 바로 값이 변경
+```bash
+data1[1] = 500
+data1[2:5] = -1.4
+print(data1[:])
+```
+
+- 저장할 공간만 미리 정해 놓고 나중에 값을 대입하는 것은 다음과 같다.
+- `flush()`를 사용하여 바로 쓰도록 해야 한다(호출하지 않으면 파일 닫힐 때 불림)
+```bash
+d = f.create_dataset('data2',shape=(5,),dtype='float')
+d[:] = fdata
+f.flush()
+```
+
+- 위에서 `dtype`을 직접 지정할 때는 numpy의 다양한 데이터타입이 가능하다( `dtype = numpy.float32`, `dtype = np.dtype('int')` 등등).
+- NumPy 배열을 데이터로 지정하면서 dtype을 지정하면 형변환이 이루어지며 복사되게 된다.
+```bash
+f.create_data('data',data=fdata,dtype=np.dtype('float32'))
+```
+
+- 위에서 `fdata`의 `dtype`은 `float64` (64비트 실수)인데, 데이터셋의 `dtype`을 `float32`로 지정했기 때문에 32 비트 크기의 배열로 저장
+
+
+### 크기가 변경가능한 데이터셋
+- 데이터셋에 저장되는 배열은 `dataset.resize(tuple)`로 변경할 수 있다.
+- 하지만 생성시 디폴트는 크기가 변경불가능
+```bash
+data = f.create_dataset('dset',(2,2),dtype='int')
+print(data.shape)   # (2,2)
+print(data.maxshape)   # (2,2)
+
+d.resize((2,10))   # error
+...
+```
+
+- 크기가 변경가능하게 하려면 `maxshape` 인자를 데이터셋을 생성할 때 지정해야 한다.
+```bash
+import numpy as np
+import h5py
+
+data = np.array([[1,2],[3,4]])
+
+f = h5py.File('datasetresize.h5','w')
+
+d = f.create_dataset('dset',(2,2),dtype='int',maxshape=(2,None))
+print(d.shape)     # (2,2)
+print(d.maxshape)  # (2,None)
+
+d[:] = data
+
+print(d[:])
+d.resize((2,10))
+print(d[:])
+f.close()
+```
+- 위 코드는 처음 데이터셋을 생성할 때 (2,2) 로 생성하고, maxshape 인자에서 `None` 지정된 축으로 크기가 변경할 수 있다는 의미이다. 즉, (2, any) 형태로 변경할 수 있다.
+
+
+## 데이터셋(2)
+
+
+## 속성
+
+
+
+## 링크
+
+
+
+## 예제
 
 
