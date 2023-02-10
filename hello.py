@@ -2,42 +2,19 @@ import sys
 input = sys.stdin.readline
 from collections import deque
 
-n, m = map(int, input().split())
-string = [list(map(str, input().strip())) for _ in range(n)]
-paint = []
+n = int(input())
+six = 666
+cnt = 0
 
-# print(string)
-# [['W', 'B', 'W', 'B', 'W', 'B', 'W', 'B'],
-#  ['B', 'W', 'B', 'W', 'B', 'W', 'B', 'W'],
-#  ['W', 'B', 'W', 'B', 'W', 'B', 'W', 'B'],
-#  ['B', 'W', 'B', 'B', 'B', 'W', 'B', 'W'], 
-#  ['W', 'B', 'W', 'B', 'W', 'B', 'W', 'B'],
-#  ['B', 'W', 'B', 'W', 'B', 'W', 'B', 'W'],
-#  ['W', 'B', 'W', 'B', 'W', 'B', 'W', 'B'],
-#  ['B', 'W', 'B', 'W', 'B', 'W', 'B', 'W']]
+while True:
+    # 현재 제목이 666을 포함되어있다면 cnt 카운트
+    if '666' in str(six):
+        cnt += 1
 
-# 반복문을 통해 체스판을 확인(8*8 범위로 자름)
-for i in range(n-7):
-    for j in range(m-7):
-        w = 0
-        b = 0
+    # cnt가 구해야하는 n번째 영화라면 six 출력
+    if cnt == n:
+        print(six)
+        break
 
-        # 8*8 체스판 확인
-        for k in range(i, i+8):
-            for l in range(j, j+8):
-                if (l + k) % 2 == 0: # 짝수
-                    if string[k][l] != 'W':
-                        w += 1
-                    else:
-                        b += 1
-                else:
-                    if string[k][l] != 'B':
-                        w += 1
-                    else:
-                        b += 1
-
-        paint.append(w)
-        paint.append(b)
-
-# 칠한 색 중에 최솟값
-print(min(paint))
+    # 제목 카운트
+    six += 1
