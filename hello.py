@@ -1,25 +1,32 @@
 import sys
+sys.stdin = open('hello.txt')
 input = sys.stdin.readline
 from collections import deque
+import pprint
 
 # n, m= map(int, input().split())
-# s = input()
+n = int(input())
+p = list(map(int, input().split()))
 
-# ans = []
+cnt = 0
+p.sort() # 오름차순 정렬
+# print(p)  [1, 2, 3, 3, 4]
 
-# for i in range(len(s)):
-#     for j in range(i, len(s)):
-#         temp = s[i:j + 1]
-#         ans.append(set(temp))
+for i in range(n):
+    for j in range(i+1): 
+        cnt += p[j]
+        # print(j)
+        # 0
+        # 0 1
+        # 0 1 2
+        # 0 1 2 3
+        # 0 1 2 3 4
 
-# print(len(ans))
-
-s = input()
-ans = set()
-
-for i in range(len(s)):
-    for j in range(i, len(s)):
-        temp = s[i:j + 1]
-        ans.add(temp)
-
-print(len(ans))
+        # print(p[j])
+        # 1
+        # 1 2
+        # 1 2 3
+        # 1 2 3 3 
+        # 1 2 3 3 4
+        # sum = 32
+print(cnt)
