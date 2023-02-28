@@ -1,4 +1,5 @@
 CREATE DATABASE 찬솔찬솔데이터데이터;
+CREATE DATABASE 찬솔데이터;
+SHOW DATABASEs;
 use 찬솔찬솔데이터데이터;
 DROP DATABASE 찬솔찬솔데이터데이터;
-SHOW DATABASEs;
