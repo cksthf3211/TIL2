@@ -4,38 +4,27 @@ input = sys.stdin.readline
 from collections import deque
 from pprint import pprint
 
+import calendar
+today = calendar.datetime.date.today()
+print(calendar.month(today.year, today.month))
+
+import datetime
+now = datetime.datetime.now()
+print("현재 시간은 ", now.strftime('%Y-%m-%d %H:%M'))
+
+
 # n, m = map(int, input().split())
 # n = list(map(int, input().split()))
 
-# 전위순회
-def preorder(root):
-    if root != '.':
-        print(root, end='')       # root
-        preorder(tree[root][0])   # left
-        preorder(tree[root][1])   # right
- 
-# 중위순회 
-def inorder(root):
-    if root != '.':
-        inorder(tree[root][0])    # left
-        print(root, end='')       # root
-        inorder(tree[root][1])    # right
- 
- 
-# 후위순회
-def postorder(root):
-    if root != '.':
-        postorder(tree[root][0])  # left
-        postorder(tree[root][1])  # right
-        print(root, end='')       # root
+import time
+import winsound
 
-tree = {}
-for i in range(int(input())):
-    root, left, right = input().strip().split()  
-    tree[root] = [left, right]
-
-preorder('A')
-print()
-inorder('A')
-print()
-postorder('A')
+# 17시59분이 되면 알람 울리기
+while True:
+    now = time.localtime()
+    if now.tm_hour == 17 and now.tm_min == 59:
+        print("알람 울립니다!")
+        winsound.Beep(440, 1000) # 440 Hz 주파수로 1초 동안 소리 울리기
+        break
+    else:
+        time.sleep(60) # 1분 대기 후 다시 검사 ctrl + c로 종료
