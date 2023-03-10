@@ -4,7 +4,7 @@ import time
 import webbrowser
 import os
 
-today = calendar.datetime.date.today()
+today = calendar.datetime.date.today()                 # date.today() 함수는 datetime 모듈에 포함된 함수 중 하나로, 현재 날짜를 반환
 print(calendar.month(today.year, today.month))
 
 now = datetime.datetime.now()
@@ -12,7 +12,7 @@ print("현재 시간은", now.strftime('%Y-%m-%d %H:%M'), '입니다.')
 
 while True:
     now = time.localtime()
-    if now.tm_hour == 18 and now.tm_min == 2:
+    if now.tm_hour == 17 and now.tm_min == 59:          # 시간 계속 바꿔주기
         print("알람 울립니다!")
         url = "https://youtu.be/xbO1CY1PXkE"
         webbrowser.open(url)
