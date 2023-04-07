@@ -10,18 +10,15 @@ while True:
     second = count % 60
     hour = minute // 60
     minute %= 60
-
     if hour < 10:
         print(f"0{hour}:{minute:02d}:{second:02d}")
-
     else:
         print(f"{hour}:{minute:02d}:{second:02d}")
-        
-    time.sleep(1)
-    count += 1
+    time.sleep(10)
+    count += 10
 
     if count % (60 * 60) == 0:
-        print(f"{hour}시간이 경과했습니다. 휴식을 권장드립니다.")
+        print(f"{hour + 1}시간이 경과했습니다. 휴식을 권장드립니다.")
 
     if count % (60 * 60 * 5) == 0:
         print(f"{hour}시간이 경과했습니다. 반드시 휴식을 취하시길 바랍니다.")

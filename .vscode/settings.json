@@ -1,4 +1,5 @@
 {
-    "python.analysis.typeCheckingMode": "off",
-    "sqltools.connections": []
+  "python.analysis.typeCheckingMode": "off",
+  "sqltools.connections": [],
+  "files.autoGuessEncoding": true
 }
