@@ -5,61 +5,19 @@ from collections import deque
 from pprint import pprint
 
 
+# 전공평점은 전공과목별 (학점 × 과목평점)의 합을 학점의 총합으로 나눈 값
+# P/F 과목의 경우 등급이 P또는 F로 표시되는데, 등급이 P인 과목은 계산에서 제외
 
-# 무한히 반복하며 사용자로부터 입력을 받음
-while True:
-    try:
-        # 사용자로부터 두 개의 정수를 입력받음
-        x, y = map(int, input().split())
+rating = {"A+": 4.5, "A0": 4.0, "B+": 3.5, "B0": 3.0, "C+": 2.5, "C0": 2.0, "D+": 1.5, "D0": 1.0, "F": 0.0}
 
-        # 현재까지의 승률을 계산
-        win_rate = y * 100 // x
+rate = 0
+sum = 0
 
-        # 현재까지의 승률이 99% 이상이면 -1을 출력하고 다음 반복으로 넘어감
-        if win_rate >= 99:
-            print("-1")
-            continue
+for i in range(20):
+    subject, score, grade = input().split()
+    if grade == "P":
+        continue
+    rate += float(score) * rating[grade]
+    sum += float(score)
 
-        # 이진 탐색을 이용하여 최소 게임 횟수를 찾음
-        left, right = 0, 1000000000
-        while left <= right:
-            mid = (left + right) // 2
-            temp_win_rate = (y + mid) * 100 // (x + mid)
-            if temp_win_rate > win_rate:
-                right = mid - 1
-            else:
-                left = mid + 1
-
-        # 최소 게임 횟수를 출력함
-        print(left)
-
-    # 예외가 발생하면 반복문을 탈출함
-    except:
-        break
-
-
-while True:
-    try:
-        x, y = map(int, input().split())
-
-        win_rate = y * 100 // x
-
-        if win_rate >= 99:
-            print("-1")
-            continue
-
-        # 최소 게임 횟수를 찾는 것이 목적이므로
-        # left, right, mid 모두 게임 횟수로 설정
-        left, right = 1, 1000000000
-        while left <= right:
-            mid = (left + right) // 2
-            temp_win_rate = (y + mid) * 100 // (x + mid)
-            if temp_win_rate <= win_rate:
-                left = mid + 1
-            else:
-                right = mid - 1
-
-        print(left)
-
-    except:
-        break
+print(rate/sum)
