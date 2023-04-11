@@ -4,20 +4,18 @@ input = sys.stdin.readline
 from collections import deque
 from pprint import pprint
 
+# n바구니, m번 공 바꾸기
+n, m = map(int, input().split())
 
-# 전공평점은 전공과목별 (학점 × 과목평점)의 합을 학점의 총합으로 나눈 값
-# P/F 과목의 경우 등급이 P또는 F로 표시되는데, 등급이 P인 과목은 계산에서 제외
+box = [i for i in range(1, n+1)]
+# print(box) [1, 2, 3, 4]
 
-rating = {"A+": 4.5, "A0": 4.0, "B+": 3.5, "B0": 3.0, "C+": 2.5, "C0": 2.0, "D+": 1.5, "D0": 1.0, "F": 0.0}
+for i in range(m):
+    i, j = map(int, input().split())
+    temp = box[i-1]
+    # print(temp) 1 3 1 2
+    box[i-1] = box[j - 1]
+    box[j - 1] = temp
 
-rate = 0
-sum = 0
-
-for i in range(20):
-    subject, score, grade = input().split()
-    if grade == "P":
-        continue
-    rate += float(score) * rating[grade]
-    sum += float(score)
-
-print(rate/sum)
+for j in box:
+    print(j, end=" ")
