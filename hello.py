@@ -5,5 +5,6 @@ from collections import deque
 from pprint import pprint
 
 
-
-print(int(input()) * int(input()))
+a = int(input())
+for i in range(1, a+1):
+    print(i)
