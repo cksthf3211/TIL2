@@ -37,4 +37,3 @@ while True:
     if ans <= cnt + 1:
         break
 
-print(ans)
