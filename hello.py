@@ -12,3 +12,4 @@ s = color.index(input().strip())
 t = color.index(input().strip())
 
 print(int(str(f) + str(s)) * (10 ** t))
+print("Project")
