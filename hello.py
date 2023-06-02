@@ -5,16 +5,18 @@ from collections import deque
 from pprint import pprint
 
 
-h1, m1, s1 = map(int, input().split(':'))
-h2, m2, s2 = map(int, input().split(':'))
+# 입력
+current_time = list(map(int, input().split(':')))
+start_time = list(map(int, input().split(':')))
 
-t = h2 * 3600 + m2 * 60 + s2 - ( h1 * 3600 + m1 * 60 + s1 )
+# 필요한 시간
+current_sec = current_time[0]*3600 + current_time[1]*60 + current_time[2]
+start_sec = start_time[0]*3600 + start_time[1]*60 + start_time[2]
+res = start_sec - current_sec
 
-if t < 0:
-    t += 60*60*24
+# 만약 다음날이면 하루만큼 시간 더해주기
+if res < 0:
+    res += 24*3600
 
-h = t // 3600 
-m = ( t % 3600 ) // 60 
-s = t % 60
-
-print( "%02d:%02d:%02d" % (h,m,s) )
+# 시간 환산 후 출력
+print(f"{res//3600:02d}:{(res%3600)//60:02d}:{res%60:02d}")
