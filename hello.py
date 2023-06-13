@@ -13,3 +13,4 @@ while True:
         print(f"{name} Senior")
     else:
         print(f"{name} Junior")
+
