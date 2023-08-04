@@ -1,0 +1,420 @@
+{% extends 'base.html' %} {% block content %} {% load rest_framework %}
+<!--  -->{% load static %}
+<!-- 검색Form 및 차트 확인 -->
+<style>
+  .responsive-div {
+    position: absolute;
+    top: 40px;
+    left: 120px;
+    background-color: white;
+    border-radius: 10px;
+    width: 1300px;
+  }
+
+  @media (max-width: 768px) {
+    /* 화면 크기가 768px 이하일 때 적용되는 스타일 */
+    .responsive-div {
+      width: 100%;
+      max-width: 500px; /* 예시로 500px로 설정, 필요에 따라 조정 가능 */
+    }
+  }
+</style>
+<div class="" style="position: absolute; top: 40px; left: 120px">
+  <div style="background-color: white">
+    <div style="border: 2px solid #000000; border-radius: 10px; width: 100%">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <div>
+          <form action="" method="GET" class="d-flex align-items-center mx-3">
+            <p class="m-2" style="white-space: nowrap">Serial No</p>
+            <input
+              type="text"
+              name="serial"
+              class="form-control"
+              placeholder="시리얼 번호를 입력하세요"
+            />
+            <button
+              type="submit"
+              class="m-2 btn btn-outline-dark"
+              style="width: 80px"
+            >
+              검색
+            </button>
+          </form>
+        </div>
+        <div>
+          {% if results|length > 0 %} {% if request.GET.serial %}
+          <button
+            onclick="return printPage();"
+            type="button"
+            class="btn btn-outline-dark"
+          >
+            인쇄
+          </button>
+          {% endif %}
+          <button
+            type="button"
+            class="btn btn-outline-dark mx-3"
+            data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop"
+          >
+            차트보기
+          </button>
+          {% else %}
+          <button
+            type="button"
+            class="btn btn-outline-dark mx-3"
+            data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop"
+          >
+            차트보기
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 차트확인 모달 -->
+<div
+  class="modal fade"
+  id="staticBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+          Serial Number {{ request.GET.serial }} 의 차트
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="m-2" style="width: 100%; height: 400px">
+          <canvas id="myChart"></canvas>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 출력 모달 -->
+<div
+  class="modal"
+  id="printBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="printBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="printBackdropLabel">
+          출력: Serial {{ request.GET.serial }}
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="m-2">
+          <p>해당 테이블을 출력하시겠습니까?</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          id=""
+          onclick="return printPage();"
+          type="button"
+          class="btn btn-light"
+          style="width: 80px"
+          data-bs-dismiss="modal"
+        >
+          OK
+        </button>
+
+        <button type="button" class="btn btn-ligth" data-bs-dismiss="modal">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 참고: https://lngnat.tistory.com/entry/%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8-%ED%94%84%EB%A6%B0%ED%8A%B8-%EC%A7%80%EC%A0%95-%EC%98%81%EC%97%AD-%EC%B6%9C%EB%A0%A5-windowprint-%EC%82%AC%EC%9A%A9#google_vignette -->
+<!-- 검색내용 -->
+<div class="" id="print" style="position: absolute; top: 120px; left: 120px">
+  <div style="background-color: white">
+    <div
+      style="
+        border: 2px solid #000000;
+        border-radius: 10px;
+        width: 100%;
+        height: 500px;
+        overflow: auto;
+      "
+    >
+      {% if result_summary %} {% if request.GET.serial %}
+      <h4
+        class="mt-3"
+        style="display: flex; flex-direction: column; align-items: center"
+      >
+        Serial {{ request.GET.serial }} 종합결과 조회 ({{ results|length }}건)
+      </h4>
+      {% else %}
+      <h4
+        class="mt-3"
+        style="display: flex; flex-direction: column; align-items: center"
+      >
+        종합결과 조회 ({{ results|length }}건)
+      </h4>
+      {% endif %} {% else %} {% if request.GET.serial %}
+      <h4
+        class="mt-3"
+        style="display: flex; flex-direction: column; align-items: center"
+      >
+        Serial {{ request.GET.serial }} 에 대한 데이터가 없습니다.
+      </h4>
+      {% else %}
+      <h4
+        class="mt-3"
+        style="display: flex; flex-direction: column; align-items: center"
+      >
+        조회된 데이터가 없습니다.
+      </h4>
+      {% endif %} {% endif %}
+
+      <div class="m-2" style="overflow: auto">
+        <div style="overflow: auto; white-space: nowrap">
+          <table class="table table-hover" style="width: max-content">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">No</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+                <th scope="col" class="text-center">ㅇㅇㅇㅇㅇ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for result, summary in result_summary %}
+              <tr onclick="selectRow(this)">
+                <th scope="row" class="text-center">{{ result.id }}</th>
+                <td
+                  class="text-center"
+                  data-result-adr_serial="{{ result.adr_serial }}"
+                >
+                  {{ result.adr_serial }}
+                </td>
+                <td class="text-center">
+                  {{ result.degree|cut:"Degree object "|cut:")"|cut:"(" }}
+                </td>
+                <td class="text-center">{{ result.irradiator_degree }}</td>
+                <td
+                  class="text-center"
+                  data-summary-date="{{ summary.t_date|date:'Y.m.d' }}"
+                >
+                  {{ summary.t_date|date:"Y.m.d" }} - {{ summary.t_time }}
+                </td>
+                <td class="text-center">{{ summary.u_name }}</td>
+                <td class="text-center">{{ summary.set_time }}</td>
+                <td class="text-center">{{ summary.resultssummary_repeat }}</td>
+                <td class="text-center">{{ summary.src_pos }}</td>
+                <td class="text-center">{{ summary.src_name }}</td>
+                <td class="text-center">{{ summary.adr_pos }}</td>
+                <td class="text-center">None</td>
+                <td class="text-center">{{ summary.resultssummary_target }}</td>
+                <td class="text-center">{{ result.average }}</td>
+                <td
+                  class="text-center"
+                  data-result-deviation="{{ result.deviation }}"
+                >
+                  {{ result.deviation }}
+                </td>
+                <td
+                  class="text-center"
+                  data-result-degree-mistake="{{ result.degree_mistake }}"
+                >
+                  {{ result.degree_mistake }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function selectRow(row) {
+    // 선택된 행의 클래스를 모두 제거해서 하나만 토글링 될 수 있게 만듬
+    const selectedRows = document.querySelectorAll(".selected");
+    selectedRows.forEach((selectedRow) => {
+      selectedRow.classList.remove("selected");
+    });
+
+    // 클릭한 행에 대한 선택 상태를 토글링
+    row.classList.add("selected");
+  }
+</script>
+
+<style>
+  /* 토글링 색상 */
+  .selected {
+    background-color: rgba(0, 123, 255, 0.25);
+  }
+</style>
+
+<!-- 차트 -->
+<script type="text/javascript">
+  // 차트 생성 함수
+  function createChart() {
+    var context = document.getElementById("myChart").getContext("2d");
+
+    // HTML에서 데이터 속성을 가져옴 (querySelectorAll로 모든 해당 요소들을 가져옴)
+    var summaryElements = document.querySelectorAll("td[data-summary-date]");
+    var resultDeviationElements = document.querySelectorAll(
+      "td[data-result-deviation]"
+    );
+    var resultDegreeMistakeElements = document.querySelectorAll(
+      "td[data-result-degree-mistake]"
+    );
+    var serialElements = document.querySelectorAll(
+      "td[data-result-adr_serial]"
+    ); // 시리얼 번호 요소 선택
+
+    // 데이터를 담을 배열 초기화
+    var summaryDates = [];
+    var resultDeviations = [];
+    var resultDegreeMistakes = [];
+    var serials = []; // 시리얼 번호 배열 초기화
+
+    // HTML에서 가져온 데이터를 배열에 추가
+    summaryElements.forEach((element) => {
+      summaryDates.push(element.dataset.summaryDate);
+    });
+
+    resultDeviationElements.forEach((element) => {
+      resultDeviations.push(element.dataset.resultDeviation);
+    });
+
+    resultDegreeMistakeElements.forEach((element) => {
+      resultDegreeMistakes.push(element.dataset.resultDegreeMistake);
+    });
+
+    serialElements.forEach((element) => {
+      serials.push(element.textContent.trim()); // 시리얼 번호 텍스트 추출하여 배열에 추가
+    });
+
+    console.log(summaryDates);
+    console.log(resultDeviations);
+    console.log(resultDegreeMistakes);
+    console.log(serials); // 시리얼 번호 확인
+
+    // 날짜를 오름차순으로 정렬
+    summaryDates.sort((a, b) => new Date(a) - new Date(b));
+
+    var myChart = new Chart(context, {
+      type: "line",
+
+      data: {
+        labels: summaryDates, // x축 - 날짜
+        datasets: [
+          //
+          {
+            label: "표준편차",
+            fill: false,
+            data: resultDeviations.map(parseFloat),
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            borderColor: "rgba(255, 99, 132, 1)",
+            borderWidth: 1,
+          },
+          //
+          {
+            label: "오차율",
+            fill: false,
+            data: resultDegreeMistakes.map(parseFloat),
+            backgroundColor: "rgba(153, 102, 255, 0.2)",
+            borderColor: "rgba(153, 102, 255, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+              },
+            },
+          ],
+        },
+        tooltips: {
+          mode: "index",
+          intersect: false,
+          callbacks: {
+            title: function (tooltipItems, data) {
+              var dataIndex = tooltipItems[0].index;
+              var serialNumber = serials[dataIndex]; // 시리얼 번호 추가
+              return "시리얼 번호: " + serialNumber;
+            },
+            // label: function (tooltipItem, data) {
+            //   var date = summaryDates[dataIndex];
+            //   var dataIndex = tooltipItem.index;
+            //   var datasetIndex = tooltipItem.datasetIndex;
+            //   var date = summaryDates[dataIndex];
+            //   var value = data.datasets[datasetIndex].data[dataIndex];
+            //   var label = data.datasets[datasetIndex].label;
+            //   return label + ': ' + value;
+            // }
+          },
+        },
+      },
+    });
+  }
+  // DOM 로드 완료 시 차트 생성
+  document.addEventListener("DOMContentLoaded", createChart);
+</script>
+
+{% endblock %}

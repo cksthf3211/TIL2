@@ -1,0 +1,227 @@
+{% extends 'base.html' %} {% block content %} {% load rest_framework %}
+<!--  -->{% load static %}
+<!-- 검색Form 및 차트 확인 -->
+<style>
+  .responsive-div {
+    position: absolute;
+    top: 40px;
+    left: 120px;
+    background-color: white;
+    border-radius: 10px;
+    width: 1300px;
+  }
+
+  @media (max-width: 768px) {
+    /* 화면 크기가 768px 이하일 때 적용되는 스타일 */
+    .responsive-div {
+      width: 100%;
+      max-width: 500px; /* 예시로 500px로 설정, 필요에 따라 조정 가능 */
+    }
+  }
+</style>
+<div class="" style="position: absolute; top: 40px; left: 120px">
+  <div style="background-color: white">
+    <div style="border: 2px solid #000000; border-radius: 10px; width: 100%">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <div>
+          <form action="" method="GET" class="d-flex align-items-center mx-3">
+            <p class="m-2" style="white-space: nowrap">Serial No</p>
+            <input
+              type="text"
+              name="serial"
+              class="form-control"
+              placeholder="시리얼 번호를 입력하세요"
+            />
+            <button
+              type="submit"
+              class="m-2 btn btn-outline-dark"
+              style="width: 80px"
+            >
+              검색
+            </button>
+          </form>
+        </div>
+        <div>
+          {% if results|length > 0 %} {% if request.GET.serial %}
+          <button
+            onclick="return printPage();"
+            type="button"
+            class="btn btn-outline-dark"
+          >
+            인쇄
+          </button>
+          {% endif %}
+          <button
+            type="button"
+            class="btn btn-outline-dark mx-3"
+            data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop"
+          >
+            차트보기
+          </button>
+          {% else %}
+          <button
+            type="button"
+            class="btn btn-outline-dark mx-3"
+            data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop"
+          >
+            차트보기
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 참고: https://lngnat.tistory.com/entry/%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8-%ED%94%84%EB%A6%B0%ED%8A%B8-%EC%A7%80%EC%A0%95-%EC%98%81%EC%97%AD-%EC%B6%9C%EB%A0%A5-windowprint-%EC%82%AC%EC%9A%A9#google_vignette -->
+<!-- 검색내용 -->
+<div class="" id="print" style="position: absolute; top: 120px; left: 120px">
+  <div style="background-color: white">
+    <div
+      style="
+        border: 2px solid #000000;
+        border-radius: 10px;
+        width: 100%;
+        height: 500px;
+        overflow: auto;
+      "
+    >
+      {% if result_summary %} {% if request.GET.serial %}
+      <h4
+        class="mt-3"
+        style="display: flex; flex-direction: column; align-items: center"
+      >
+        Serial {{ request.GET.serial }} 종합결과 조회 ({{ results|length }}건)
+      </h4>
+      {% else %}
+      <h4
+        class="mt-3"
+        style="display: flex; flex-direction: column; align-items: center"
+      >
+        종합결과 조회 ({{ results|length }}건)
+      </h4>
+      {% endif %} {% else %} {% if request.GET.serial %}
+      <h4
+        class="mt-3"
+        style="display: flex; flex-direction: column; align-items: center"
+      >
+        Serial {{ request.GET.serial }} 에 대한 데이터가 없습니다.
+      </h4>
+      {% else %}
+      <h4
+        class="mt-3"
+        style="display: flex; flex-direction: column; align-items: center"
+      >
+        조회된 데이터가 없습니다.
+      </h4>
+      {% endif %} {% endif %}
+
+      <div class="m-2" style="overflow: auto">
+        <div style="overflow: auto; white-space: nowrap">
+          <table class="table table-hover" style="width: max-content">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">No</th>
+                <th scope="col" class="text-center">Serial</th>
+                <th scope="col" class="text-center">교정차수</th>
+                <th scope="col" class="text-center">조사차수</th>
+                <th scope="col" class="text-center">검사일시</th>
+                <th scope="col" class="text-center">검사자</th>
+                <th scope="col" class="text-center">설정시간</th>
+                <th scope="col" class="text-center">반복횟수</th>
+                <th scope="col" class="text-center">소스위치</th>
+                <th scope="col" class="text-center">소스명</th>
+                <th scope="col" class="text-center">ADR 위치</th>
+                <th scope="col" class="text-center">ADR Index</th>
+                <th scope="col" class="text-center">목표 선량</th>
+                <th scope="col" class="text-center">평균 선량</th>
+                <th scope="col" class="text-center">표준 편차</th>
+                <th scope="col" class="text-center">오차</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for result, summary in result_summary %}
+              <tr onclick="selectRow(this)">
+                <th scope="row" class="text-center">{{ result.id }}</th>
+                <td
+                  class="text-center"
+                  data-result-adr_serial="{{ result.adr_serial }}"
+                >
+                  {{ result.adr_serial }}
+                </td>
+                <td class="text-center">
+                  {{ result.degree|cut:"Degree object "|cut:")"|cut:"(" }}
+                </td>
+                <td class="text-center">{{ result.irradiator_degree }}</td>
+                <td
+                  class="text-center"
+                  data-summary-date="{{ summary.t_date|date:'Y.m.d' }}"
+                >
+                  {{ summary.t_date|date:"Y.m.d" }} - {{ summary.t_time }}
+                </td>
+                <td class="text-center">{{ summary.u_name }}</td>
+                <td class="text-center">{{ summary.set_time }}</td>
+                <td class="text-center">{{ summary.resultssummary_repeat }}</td>
+                <td class="text-center">{{ summary.src_pos }}</td>
+                <td class="text-center">{{ summary.src_name }}</td>
+                <td class="text-center">{{ summary.adr_pos }}</td>
+                <td class="text-center">None</td>
+                <td class="text-center">{{ summary.resultssummary_target }}</td>
+                <td class="text-center">{{ result.average }}</td>
+                <td
+                  class="text-center"
+                  data-result-deviation="{{ result.deviation }}"
+                >
+                  {{ result.deviation }}
+                </td>
+                <td
+                  class="text-center"
+                  data-result-degree-mistake="{{ result.degree_mistake }}"
+                >
+                  {{ result.degree_mistake }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 프린터 출력
+
+  // 원래 페이지의 HTML 구조를 변경
+  var initBodyHtml;
+
+  function printPage() {
+    window.print();
+  }
+
+  // 프린트 출력 이전 이벤트 발생
+  // 미리보기시 콜백함수 실행
+  function beforePrint() {
+    initBodyHtml = document.body.innerHTML;
+    document.body.innerHTML = document.getElementById("print").innerHTML;
+  }
+
+  // 프린트 출력 이후 이벤트 발생
+  // 미리보기 취소 후 또는 프린트 완료 후 실행
+  function afterPrint() {
+    document.body.innerHTML = initBodyHtml;
+  }
+
+  window.onbeforeprint = beforePrint;
+  window.onafterprint = afterPrint;
+</script>
+{% endblock %}
