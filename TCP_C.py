@@ -1,10 +1,10 @@
 import socket
 
-# server_ip = '192.168.0.11'  # 서버 IP
-server_ip = '192.168.0.198'  # 서버 IP
+server_ip = '192.168.0.11'  # 서버 IP
+# server_ip = '192.168.0.198'  # 서버 IP
 
-# server_port = 4004  # 서버 포트번호
-server_port = 81
+server_port = 4004  # 서버 포트번호
+# server_port = 81
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((server_ip, server_port))
